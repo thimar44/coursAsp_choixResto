@@ -10,5 +10,6 @@ namespace choixResto.Models
     {
         public DbSet<Sondage> Sondages { get; set; }
         public DbSet<Resto> Restos { get; set; }
+        public DbSet<Utilisateur> Utilisateurs { get; set; }
     }
 }
