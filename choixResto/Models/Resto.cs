@@ -9,6 +9,7 @@ namespace choixResto.Models
     [Table("Restos")]
     public class Resto
     {
+        //test github
         public int Id { get; set; }
         public string Nom { get; set; }
         public string Telephone { get; set; }
