@@ -9,37 +9,53 @@ namespace choixResto.Controllers
 {
     public class RestaurantController : Controller
     {
-        // GET: Restaurant
+        private IDal dal;
+
+        public RestaurantController() : this(new Dal())
+        {
+        }
+
+        public RestaurantController(IDal dalIoc)
+        {
+            dal = dalIoc;
+        }
+
         public ActionResult Index()
         {
-            using (IDal dal = new Dal())
+            List<Resto> listeDesRestaurants = dal.ObtientTousLesRestaurants();
+            return View(listeDesRestaurants);
+        }
+
+        public ActionResult CreerRestaurant()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult CreerRestaurant(Resto resto)
+        {
+            if (dal.RestaurantExiste(resto.Nom))
             {
-                List<Resto> listeDesRestaurants = dal.ObtientTousLesRestaurants();
-                return View(listeDesRestaurants);
+                ModelState.AddModelError("Nom", "Ce nom de restaurant existe déjà");
+                return View(resto);
             }
+            if (!ModelState.IsValid)
+                return View(resto);
+            dal.CreerRestaurant(resto.Nom, resto.Telephone);
+            return RedirectToAction("Index");
         }
 
         public ActionResult ModifierRestaurant(int? id)
         {
             if (id.HasValue)
             {
-                using (IDal dal = new Dal())
-                {
-                    if (Request.HttpMethod == "POST")
-                    {
-                        string nouveauNom = Request.Form["Nom"];
-                        string nouveauTelephone = Request.Form["Telephone"];
-                        dal.ModifierRestaurant(id.Value, nouveauNom, nouveauTelephone);
-                    }
-
-                    Resto restaurant = dal.ObtientTousLesRestaurants().FirstOrDefault(r => r.Id == id.Value);
-                    if (restaurant == null)
-                        return View("Error");
-                    return View(restaurant);
-                }
+                Resto restaurant = dal.ObtientTousLesRestaurants().FirstOrDefault(r => r.Id == id.Value);
+                if (restaurant == null)
+                    return View("Error");
+                return View(restaurant);
             }
             else
-                return View("Error");
+                return HttpNotFound();
         }
 
         [HttpPost]
@@ -47,11 +63,8 @@ namespace choixResto.Controllers
         {
             if (!ModelState.IsValid)
                 return View(resto);
-            using (IDal dal = new Dal())
-            {
-                dal.ModifierRestaurant(resto.Id, resto.Nom, resto.Telephone);
-                return RedirectToAction("Index");
-            }
+            dal.ModifierRestaurant(resto.Id, resto.Nom, resto.Telephone);
+            return RedirectToAction("Index");
         }
     }
 }

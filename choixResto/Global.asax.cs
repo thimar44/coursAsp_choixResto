@@ -15,10 +15,6 @@ namespace choixResto
         {
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-
-            IDatabaseInitializer<BddContext> init = new InitChoixResto();
-            Database.SetInitializer(init);
-            init.InitializeDatabase(new BddContext());
         }
     }
 }

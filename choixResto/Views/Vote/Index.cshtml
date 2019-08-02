@@ -1,0 +1,23 @@
+﻿@model List<choixResto.Models.Resto>
+@{
+    ViewBag.Title = "Votez les amis !!";
+}
+
+<h2>Cocher les restaurant où vous voulez bien aller. Attention, le vote est définitif!</h2>
+
+<h3>@ViewBag.idSondage</h3>
+
+@using (Html.BeginForm("EnregistrerVote", "Vote"))
+{
+    <table>
+        @foreach (var resto in Model)
+        {
+            <tr>
+                <td>@Html.CheckBox(resto.Nom, false)</td>
+                <td>@resto.Nom (@resto.Telephone)</td>
+            </tr>
+        }
+    </table>
+
+     <input type="submit" value="Modifier" />
+}

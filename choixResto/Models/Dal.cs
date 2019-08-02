@@ -63,12 +63,38 @@ namespace choixResto.Models
             return bdd.Utilisateurs.FirstOrDefault(u => u.Id == id);
         }
 
-        public Utilisateur ObtenirUtilisateur(string idStr)
+        /*public Utilisateur ObtenirUtilisateur(string idStr)
         {
             int id;
             if (int.TryParse(idStr, out id))
                 return ObtenirUtilisateur(id);
             return null;
+        }*/
+
+        public Utilisateur ObtenirUtilisateur(string idStr)
+        {
+            switch (idStr)
+            {
+                case "Chrome":
+                    return CreeOuRecupere("Nico", "1234");
+                case "IE":
+                    return CreeOuRecupere("Jérémie", "1234");
+                case "Firefox":
+                    return CreeOuRecupere("Delphine", "1234");
+                default:
+                    return CreeOuRecupere("Timéo", "1234");
+            }
+        }
+
+        private Utilisateur CreeOuRecupere(string nom, string motDePasse)
+        {
+            Utilisateur utilisateur = Authentifier(nom, motDePasse);
+            if (utilisateur == null)
+            {
+                int id = AjouterUtilisateur(nom, motDePasse);
+                return ObtenirUtilisateur(id);
+            }
+            return utilisateur;
         }
 
         public int CreerUnSondage()
@@ -108,7 +134,7 @@ namespace choixResto.Models
             return resultats;
         }
 
-        public bool ADejaVote(int idSondage, string idStr)
+        /*public bool ADejaVote(int idSondage, string idStr)
         {
             int id;
             if (int.TryParse(idStr, out id))
@@ -119,8 +145,19 @@ namespace choixResto.Models
                 return sondage.Votes.Any(v => v.Utilisateur != null && v.Utilisateur.Id == id);
             }
             return false;
+        }*/
+        public bool ADejaVote(int idSondage, string idStr)
+        {
+            Utilisateur utilisateur = ObtenirUtilisateur(idStr);
+            if (utilisateur != null)
+            {
+                Sondage sondage = bdd.Sondages.First(s => s.Id == idSondage);
+                if (sondage.Votes == null)
+                    return false;
+                return sondage.Votes.Any(v => v.Utilisateur != null && v.Utilisateur.Id == utilisateur.Id);
+            }
+            return false;
         }
-
         public void Dispose()
         {
             bdd.Dispose();
